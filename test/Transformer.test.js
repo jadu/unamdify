@@ -61,6 +61,10 @@ describe('Transformer', function () {
                 it('should remove the define and add var declarations calling require()', function () {
                     expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a, b) { return 4; });')).to.equal('var a = require("lib/a"), b = require("lib/b");\nmodule.exports = 4;');
                 });
+
+                it('should preserve any "use strict" pragma and keep it as the first statement', function () {
+                    expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a, b) { /* An intro comment */ "use strict"; return 4; });')).to.equal('"use strict";\nvar a = require("lib/a"), b = require("lib/b");\nmodule.exports = 4;');
+                });
             });
 
             describe('when there are more dependencies than factory function args', function () {
