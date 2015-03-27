@@ -19,6 +19,10 @@ describe('Transformer', function () {
                     it('should remove the define', function () {
                         expect(this.transformer.transform('define(function () { finish(); });')).to.equal('finish();');
                     });
+
+                    it('should preserve newlines between statements', function () {
+                        expect(this.transformer.transform('define(function () { start();\nfinish(); });')).to.equal('start();\nfinish();');
+                    });
                 });
 
                 describe('but an export', function () {
@@ -41,32 +45,32 @@ describe('Transformer', function () {
 
                 describe('but a return statement inside a sub-function declaration of the factory', function () {
                     it('should remove the define but leave the return statement alone', function () {
-                        expect(this.transformer.transform('define(function () { function ret() { return 21; } ret(); });')).to.equal('function ret() { return 21; }ret();');
+                        expect(this.transformer.transform('define(function () { function ret() { return 21; } ret(); });')).to.equal('function ret() { return 21; }\nret();');
                     });
                 });
             });
 
             describe('with two dependencies, both imported as args, and an export', function () {
                 it('should remove the define and add var declarations calling require()', function () {
-                    expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a, b) { return 4; });')).to.equal('var a = require("lib/a"), b = require("lib/b"); module.exports = 4;');
+                    expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a, b) { return 4; });')).to.equal('var a = require("lib/a"), b = require("lib/b");\nmodule.exports = 4;');
                 });
             });
 
             describe('when there are more dependencies than factory function args', function () {
                 it('should remove the define and add var declarations calling require()', function () {
-                    expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a) { return 4; });')).to.equal('var a = require("lib/a"); require("lib/b"); module.exports = 4;');
+                    expect(this.transformer.transform('define(["lib/a", "lib/b"], function (a) { return 4; });')).to.equal('var a = require("lib/a");\nrequire("lib/b");\nmodule.exports = 4;');
                 });
             });
 
             describe('when there are more factory function args than dependencies', function () {
                 it('should remove the define and add var declarations calling require()', function () {
-                    expect(this.transformer.transform('define(["lib/a"], function (a, b, c) { return 4; });')).to.equal('var a = require("lib/a"), b, c; module.exports = 4;');
+                    expect(this.transformer.transform('define(["lib/a"], function (a, b, c) { return 4; });')).to.equal('var a = require("lib/a"), b, c;\nmodule.exports = 4;');
                 });
             });
 
             describe('when the module uses require() but the factory returns a value', function () {
                 it('should remove the define but not modify the return statement', function () {
-                    expect(this.transformer.transform('require(["lib/a"], function (a) { return 4; });')).to.equal('var a = require("lib/a"); return 4;');
+                    expect(this.transformer.transform('require(["lib/a"], function (a) { return 4; });')).to.equal('var a = require("lib/a");\nreturn 4;');
                 });
             });
         });
