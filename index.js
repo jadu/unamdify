@@ -2,6 +2,11 @@
  * UnAMDify
  *
  * Browserify transform that rewrites AMD modules to be CommonJS compliant.
+ *
+ * Copyright 2015 Jadu
+ *
+ * Released under the MIT license
+ * https://github.com/jadu/unamdify/blob/master/LICENSE.txt
  */
 
 'use strict';
