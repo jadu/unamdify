@@ -80,6 +80,12 @@ describe('Transformer', function () {
                     expect(this.transformer.transform('require(["lib/a"], function (a) { return 4; });')).to.equal('var a = require("lib/a");\nreturn 4;');
                 });
             });
+
+            describe('when the module uses define() but then has a nested require()', function () {
+                it('should process the nested require() dependencies and remove the nested require()', function () {
+                    expect(this.transformer.transform('require(["lib/a"], function (a) { before(); require(["lib/b"], function (b) { during(b); }); after(); });')).to.equal('var a = require("lib/a");\nbefore();\nvar b = require("lib/b");\nduring(b);\nafter();');
+                });
+            });
         });
 
         describe('When module has no define() or require() calls', function () {
