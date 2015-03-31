@@ -58,7 +58,7 @@ describe('Transformer', function () {
             });
 
             describe('with one dependency and the define() call inside an expression', function () {
-                it('should ...', function () {
+                it('should preserve the enclosing expression', function () {
                     expect(this.transformer.transform('21 ? define(["lib/a"], function (a) { return 4; }) : 22;')).to.equal('21 ? (function () {var a = require("lib/a");\nmodule.exports = 4;}()) : 22;');
                 });
             });
@@ -106,7 +106,7 @@ describe('Transformer', function () {
 
         describe('When module has an outer function around the define() call', function () {
             it('should not modify the source', function () {
-                expect(this.transformer.transform('(function () { module.exports = 21; }());')).to.equal('(function () { module.exports = 21; }());');
+                expect(this.transformer.transform('(function () { define(function () { return 21; }); }());')).to.equal('(function () { define(function () { return 21; }); }());');
             });
         });
     });
